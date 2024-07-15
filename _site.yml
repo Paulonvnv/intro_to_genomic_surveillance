@@ -1,0 +1,19 @@
+name: 'MHap-Analysis'
+navbar:
+  title: 'MHap-Analysis'
+  left:
+    - text: 'Home'
+      href: index.html
+    - text: 'Intro to R'
+      href: Intro_to_R.html
+    - text: 'Performance of amplicon sequencing data'
+      href: Sequencing_Performance.html
+    - text: 'Drug Resistance Surveillance'
+      href: Drug_Resistance_Surveillance.html
+    - text: 'Complexity of infection (COI)'
+      href: Complexity_of_infection.html
+    - text: 'PopStructure and Connectivity'
+      href: PopStructure_and_Connectivity.html
+    - text: 'Genetic Relatedness (IBD) and Tranmission'
+      href: IBD_and_Tranmission.html
+output_dir: 'docs'

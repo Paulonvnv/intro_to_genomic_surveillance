@@ -1,0 +1,16 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+docs/data/Pviv_example/Run1/Fastq
+docs/data/Pviv_example/Run1/alignments
+docs/data/Pviv_example/Run1/dada2/preprocess_fq
+docs/data/Pviv_example/Run1/dada2/prim_fq
+docs/data/Pviv_example/Run1/dada2/run_dada2/filtered
+
+docs/data/Pviv_example/Run2/Fastq
+docs/data/Pviv_example/Run2/alignments
+docs/data/Pviv_example/Run2/dada2/preprocess_fq
+docs/data/Pviv_example/Run2/dada2/prim_fq
+docs/data/Pviv_example/Run2/dada2/run_dada2/filtered
+docs/data/Pviv_example/Run2/Pv_Run1-413086072
