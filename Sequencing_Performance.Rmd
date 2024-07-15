@@ -6,7 +6,7 @@ output:
     toc: yes
     number_sections: no
     toc_float: yes
-    code_folding: hide
+    code_folding: show
 editor_options:
   markdown:
     wrap: 72
@@ -246,7 +246,6 @@ want to differentiate samples from controls, set this argument equals to
 `list_of_files` is a vector with the names of all files we want to read.
 
 ```{r 'Uploading data sets'}
-
 cigar_object = read_cigar_tables(paths = "~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example", sample_id_pattern = ".")
 ```
 
@@ -292,7 +291,7 @@ ID.
 Inspect the metadata slot and check if the IDs tell you something about
 the procidence of the samples
 
-```{r}
+```{r, eval = FALSE}
 View(cigar_object@metadata)
 ```
 
@@ -698,7 +697,7 @@ print(paste0(length(n_off_target_alleles), ' allele(s) match(es) the criteria to
 
 Check what are those allele:
 
-```{r}
+```{r, eval = FALSE}
 
 View(off_target_stats%>%
   filter(dVSITES_ij >= 0.3))
@@ -770,7 +769,7 @@ print(paste0(length(n_flanking_INDEL_alleles), ' allele(s) match(es) the criteri
 ```
 
 
-```{r}
+```{r, eval = FALSE}
 View(
   flanking_INDEL_stats %>%
     filter(flanking_INDEL == TRUE & h_ij >= 0.66 & h_ijminor >= 0.66)
@@ -847,7 +846,7 @@ print(paste0(length(n_PCR_errors_alleles), ' allele(s) match(es) the criteria to
 ```
 
 
-```{r}
+```{r, eval = FALSE}
 View(
   PCR_errors_stats %>%
     filter(h_ij >= 0.66 & h_ijminor >= 0.66))
@@ -928,14 +927,15 @@ Keep samples with at least 50% of amplified loci
 ampseq_object = sample_amplification_rate(ampseq_object, threshold = 0.5, strata = 'Country', update_samples = T)
 ```
 
-## Exportable the filtered ampseq_object
-
+## Export the filtered ampseq_object
 
 ```{r}
 write_ampseq(ampseq_object, name = '~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered.xlsx', format = 'excel')
 ```
 
+The exported ampseq object can also be uploaded in R to be used for other pipelines
+
 ```{r}
-test = read_ampseq(file = '~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered.xlsx', 
+ampseq_object2 = read_ampseq(file = '~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered.xlsx', 
                    format = 'excel')
 ```

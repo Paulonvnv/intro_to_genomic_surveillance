@@ -6,7 +6,7 @@ output:
     toc: yes
     number_sections: no
     toc_float: yes
-    code_folding: hide
+    code_folding: show
 editor_options:
   markdown:
     wrap: 72

@@ -1,6 +1,6 @@
-name: 'MHap-Analysis'
+name: 'Amplicon Sequencing Analysis'
 navbar:
-  title: 'MHap-Analysis'
+  title: 'Amplicon Sequencing Analysis'
   left:
     - text: 'Home'
       href: index.html

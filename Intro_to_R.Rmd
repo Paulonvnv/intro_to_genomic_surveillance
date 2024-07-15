@@ -1,6 +1,6 @@
 ---
 title: "Intro to R"
-author: "Neafsey Lab"
+author: "Paulo Manrique"
 output:
   html_document:
     toc: yes
