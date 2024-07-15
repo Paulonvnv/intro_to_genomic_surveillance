@@ -5,7 +5,7 @@ The purpose of this repository is to introduce researchers in the analysis of ge
 This covers 4 tutorials:
 
 - [Intro to R](https://paulonvnv.github.io/intro_to_genomic_surveillance/Intro_to_R.html),
-- Evaluation of the [Performance of amplicon sequencing data](https://paulonvnv.github.io/intro_to_genomic_surveillance/Sequencing_PErformance.html),
+- Evaluation of the [Performance of amplicon sequencing data](https://paulonvnv.github.io/intro_to_genomic_surveillance/Sequencing_Performance.html),
 - [Drug Resistance Surveillance](https://paulonvnv.github.io/intro_to_genomic_surveillance/Drug_resistance_surveillance.html),
 
 
