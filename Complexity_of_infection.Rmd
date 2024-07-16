@@ -6,13 +6,11 @@ output:
     toc: yes
     number_sections: no
     toc_float: yes
-    code_folding: hide
+    code_folding: show
 editor_options:
   markdown:
     wrap: 72
   chunk_output_type: inline
-params:
-  RData_image: ""
 ---
 
 In malaria epidemiology, the term polyclonality represents the
@@ -36,12 +34,6 @@ or relapse behavior in *P. vivax* may modify this relationship).
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, include = TRUE)
 ```
 
-```{r}
-library(dplyr)
-library(magrittr)
-load(params$RData_image)
-
-```
 
 ## Differentiating monoclonal and polyclonal infections
 
@@ -104,24 +96,44 @@ methods are not currently incorporated in the workflow.
 In the current workflow, the user is able to set their own criteria to
 distinguish between monoclonal and polyclonal samples based on the
 combination of the metrics mentioned above. These criteria are set via
-the parameter `poly_formula` in Terra (default
+the parameter `poly_formula` (default
 `"poly_formula": "NHetLoci>1"`).
 
+1. First load libraries and functions in R:
+
+```{r 'Loading required packages and functions'}
+source('~/Documents/Github/intro_to_genomic_surveillance/docs/functions_and_libraries/amplseq_required_libraries.R')
+source('~/Documents/Github/intro_to_genomic_surveillance/docs/functions_and_libraries/amplseq_functions.R')
+#sourceCpp('~/Documents/Github/intro_to_genomic_surveillance/docs/functions_and_libraries/hmmloglikelihood.cpp')
+```
+
+2. Read the ampseq_object in excel format:
+
+```{r}
+ampseq_object = read_ampseq(file = '~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered2.xlsx', 
+                   format = 'excel')
+```
+
+3. Identify polyclonal infections by Country
+
+```{r}
+poly_by_Country = get_polygenomic(ampseq_object = ampseq_object, 
+                                   strata = 'Country',
+                                   update_popsummary = FALSE,
+                                   na.rm = T,
+                                   filters = NULL,
+                                   poly_quantile = 0.75,
+                                   poly_formula = "NHetLoci > 1")
+
+```
 In the following plot you can inspect the distribution of the fraction
 of heterozygous loci by sample (Frac_HetLoci), within-host divergence
 (Fws), and the maximum number of alleles found in a sample at any locus.
 
 ```{r, fig.width=6, fig.height=6, fig.cap = "**Figure 1:** Distribution of the fraction of heterozygous loci by sample (fracHetLoci), within-host divergence (Fws), and the maximum number of alleles found in a sample at any locus. Dotted lines represent the quantiles defined by the poly_quantile argument in Terra."}
 
-if(is.na(Variable1)){
-  
-  poly_total$plot_fracHet_vs_Fws
-  
-}else{
-  
-  poly_by_Var1$plot_fracHet_vs_Fws
-  
-}
+poly_by_Country$plot_fracHet_vs_Fws
+
 
 ```
 
@@ -131,19 +143,10 @@ also presented.
 
 ```{r}
 
-if(is.na(Variable1)){
-  
-  poly_total$coi_bySample %>% DT::datatable(extensions = 'Buttons',
+poly_by_Country$coi_bySample %>% DT::datatable(extensions = 'Buttons',
                 options = list(dom = 'Blfrtip',
                   buttons = c('csv', 'excel')))
-  
-}else{
-  
-  poly_by_Var1$coi_bySample %>% DT::datatable(extensions = 'Buttons',
-                options = list(dom = 'Blfrtip',
-                  buttons = c('csv', 'excel')))
-  
-}
+
 ```
 
 The proportion of samples which show heterozygosity at each locus is
@@ -151,41 +154,44 @@ specified below:
 
 ```{r}
 
-if(is.na(Variable1)){
-  
-  poly_total$coi_byLoci %>% DT::datatable(extensions = 'Buttons',
+poly_by_Country$coi_byLoci %>% DT::datatable(extensions = 'Buttons',
                 options = list(dom = 'Blfrtip',
                   buttons = c('csv', 'excel')))
-  
-}else{
-  
-  poly_by_Var1$coi_byLoci %>% DT::datatable(extensions = 'Buttons',
-                options = list(dom = 'Blfrtip',
-                  buttons = c('csv', 'excel')))
-  
-}
+
 ```
 
-### Proportion of polyclonal infections by Variable1
+### Proportion of polyclonal infections by Country
 
 The proportion of polyclonal infections by each category of the
 Variable1 is presented in the following table and figure.
 
 ```{r}
 
-if(is.na(Variable1)){
-  
-  poly_total$pop_summary %>% DT::datatable(extensions = 'Buttons',
+poly_by_Country$pop_summary %>% DT::datatable(extensions = 'Buttons',
                 options = list(dom = 'Blfrtip',
                   buttons = c('csv', 'excel')))
-  
-}else{
-  
-  poly_by_Var1$pop_summary %>% DT::datatable(extensions = 'Buttons',
-                options = list(dom = 'Blfrtip',
-                  buttons = c('csv', 'excel')))
-  
-}
+
+```
+
+Plot the fraction of polyclonal samples per Country
+
+```{r}
+plot_poly_by_pop = poly_by_Country$pop_summary %>% 
+      ggplot(aes(x = factor(pop, 
+                            levels = c(unique(poly_by_Country$pop_summary$pop)[unique(poly_by_Country$pop_summary$pop) != 'Total'], "Total")),
+                 y = prop_poly,
+                 fill = factor(pop, 
+                               levels = c(unique(poly_by_Country$pop_summary$pop)[unique(poly_by_Country$pop_summary$pop) != 'Total'], "Total"))))+
+      geom_col(alpha = .6) +
+      geom_errorbar(aes(ymin = prop_poly_lower, ymax = prop_poly_upper), width = .2)+
+      theme_bw() +
+      labs(title = "Frequency of polyclonal infections",
+           y = "Frecquency") +
+      scale_fill_manual(values = c('firebrick', 'dodgerblue', 'green4', 'gold3', "gray30"))+
+      theme(axis.text = element_text(size = 12),
+            axis.title = element_blank(),
+            legend.position = "none",
+            axis.text.x = element_text(angle = 90, vjust = 0.5))
 ```
 
 ```{r}
@@ -194,37 +200,197 @@ fig2.width = 1*length(unique(plot_poly_by_pop$data$pop))
 ```
 
 ```{r, fig.width=fig2.width, fig.height=fig2.height, fig.cap="**Figure 2:** Proportions of polyclonal infections by Variable1. 95% confidence intervals are computed using a Fisher exact test."}
-if(!is.na(Variable1)){
-  plot_poly_by_pop
-}
+plot_poly_by_pop
 
 ```
 
-### Proportion of polyclonal infections by Variable1 and Variable2
+### Add information to the ampseq object and save
+
+```{r}
+ampseq_object@metadata = left_join(ampseq_object@metadata,
+                                   poly_by_Country$coi_bySample,
+                                   by = 'Sample_id'
+                                   )
+
+ampseq_object@loci_performance = left_join(ampseq_object@loci_performance,
+                                           poly_by_Country$coi_byLoci,
+                                           by = join_by(loci == locus)
+                                           )
+
+write_ampseq(ampseq_object, format = 'excel', name = '~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered3.xlsx')
+
+```
+
+
+## Polyclonal infections in P. falciparum
+
+
+2. Read the ampseq_object in excel format:
+
+```{r}
+pfal_ampseq_object = read_ampseq(file = '~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pfal_example/Pfal_ampseq_filtered.xlsx', 
+                   format = 'excel')
+```
+
+3. Identify polyclonal infections by Subnational_level2
+
+```{r}
+poly_by_snl2 = get_polygenomic(ampseq_object = pfal_ampseq_object, 
+                                   strata = 'Subnational_level2',
+                                   update_popsummary = FALSE,
+                                   na.rm = T,
+                                   filters = NULL,
+                                   poly_quantile = 0.75,
+                                   poly_formula = "NHetLoci > 1")
+
+```
+In the following plot you can inspect the distribution of the fraction
+of heterozygous loci by sample (Frac_HetLoci), within-host divergence
+(Fws), and the maximum number of alleles found in a sample at any locus.
+
+```{r, fig.width=6, fig.height=6, fig.cap = "**Figure 1:** Distribution of the fraction of heterozygous loci by sample (fracHetLoci), within-host divergence (Fws), and the maximum number of alleles found in a sample at any locus. Dotted lines represent the quantiles defined by the poly_quantile argument in Terra."}
+
+poly_by_snl2$plot_fracHet_vs_Fws
+
+
+```
+
+All metrics are shown at the sample level in the following table.
+Information specifying which loci show heterozygosity in each sample is
+also presented.
+
+```{r}
+
+poly_by_snl2$coi_bySample %>% DT::datatable(extensions = 'Buttons',
+                options = list(dom = 'Blfrtip',
+                  buttons = c('csv', 'excel')))
+
+```
+
+The proportion of samples which show heterozygosity at each locus is
+specified below:
+
+```{r}
+
+poly_by_snl2$coi_byLoci %>% DT::datatable(extensions = 'Buttons',
+                options = list(dom = 'Blfrtip',
+                  buttons = c('csv', 'excel')))
+
+```
+
+### Proportion of polyclonal infections by Subnational_level2 
+
+The proportion of polyclonal infections by each category of the
+Variable1 is presented in the following table and figure.
+
+```{r}
+
+poly_by_snl2$pop_summary %>% DT::datatable(extensions = 'Buttons',
+                options = list(dom = 'Blfrtip',
+                  buttons = c('csv', 'excel')))
+
+```
+
+Plot the fraction of polyclonal samples per Country
+
+```{r}
+plot_poly_by_snl2 = poly_by_snl2$pop_summary %>% 
+      ggplot(aes(x = factor(pop, 
+                            levels = c(unique(poly_by_snl2$pop_summary$pop)[unique(poly_by_snl2$pop_summary$pop) != 'Total'], "Total")),
+                 y = prop_poly,
+                 fill = factor(pop, 
+                               levels = c(unique(poly_by_snl2$pop_summary$pop)[unique(poly_by_snl2$pop_summary$pop) != 'Total'], "Total"))))+
+      geom_col(alpha = .6) +
+      geom_errorbar(aes(ymin = prop_poly_lower, ymax = prop_poly_upper), width = .2)+
+      theme_bw() +
+      labs(title = "Frequency of polyclonal infections",
+           y = "Frecquency") +
+      scale_fill_manual(values = c('firebrick', 'dodgerblue', 'green4', 'gold3', 'orange', "gray30"))+
+      theme(axis.text = element_text(size = 12),
+            axis.title = element_blank(),
+            legend.position = "none",
+            axis.text.x = element_text(angle = 90, vjust = 0.5))
+```
+
+```{r}
+fig2.height = 2.5 + max(round(nchar(as.character(unique(plot_poly_by_snl2$data$pop)))/10, 0))
+fig2.width = 1*length(unique(plot_poly_by_snl2$data$pop))
+```
+
+```{r, fig.width=fig2.width, fig.height=fig2.height, fig.cap="**Figure 2:** Proportions of polyclonal infections by Variable1. 95% confidence intervals are computed using a Fisher exact test."}
+plot_poly_by_snl2
+
+```
+
+### Proportion of polyclonal infections by Subnational_level2 and Quarter_of_Collection
 
 The proportion of polyclonal infections by each category of Variable1
 and Variable2 is presented in the following table and figure.
 
 ```{r}
-if(!is.na(Variable1) & !is.na(Variable2)){
-  
-  poly_by_Var1_Var2$pop_summary %>% DT::datatable(extensions = 'Buttons',
+
+pfal_ampseq_object@metadata[['snl2_qc']] = 
+  paste(pfal_ampseq_object@metadata[['Subnational_level2']], 
+        pfal_ampseq_object@metadata[['Quarter_of_Collection']], sep = '::')
+    
+poly_by_snl2_qc = get_polygenomic(ampseq_object = pfal_ampseq_object,
+                                  strata = "snl2_qc",
+                                  update_popsummary = F,
+                                  na.rm = TRUE,
+                                  filters = NULL,
+                                  poly_quantile = .75, 
+                                  poly_formula = "NHetLoci > 1"
+                                  )    
+
+```
+
+```{r}
+poly_by_snl2_qc$pop_summary %>% DT::datatable(extensions = 'Buttons',
                 options = list(dom = 'Blfrtip',
                   buttons = c('csv', 'excel')))
-}
+```
+
+
+```{r}
+
+plot_poly_by_snl2_qc = poly_by_snl2_qc$pop_summary %>%
+      filter(pop != 'Total')%>%
+      mutate(
+        Subnational_level2 = stringr::str_split(pop, '::', simplify = TRUE)[,1],
+        Quarter_of_Collection = stringr::str_split(pop, '::', simplify = TRUE)[,2],
+        prop_poly_lower = case_when(
+          prop_poly == 0 ~ 0,
+          prop_poly != 0 ~ prop_poly_lower),
+        prop_poly_upper = case_when(
+          prop_poly == 0 ~ 0,
+          prop_poly != 0 ~ prop_poly_upper)
+      )%>%
+      ggplot(aes(x = Quarter_of_Collection,
+                 y = prop_poly,
+                 ymin = prop_poly_lower,
+                 ymax = prop_poly_upper,
+                 fill = Subnational_level2))+
+      geom_col()+
+      geom_errorbar(width = .2)+
+      facet_wrap(~Subnational_level2, ncol = 3)+
+      theme_bw()+
+      scale_fill_manual(values = c('firebrick', 'dodgerblue', 'green4', 'gold3', 'orange'))+
+      labs(title = 'Temporal change of the proportion of polyclonal infections',
+           y = "Polyclonal infections",
+           x = "Quarter of Collection")+
+      theme(axis.text.x = element_text(angle = 90, vjust = 0.5),
+            legend.position =  "none")
+
 ```
 
 ```{r, include=FALSE}
-fig3.height = 3*ceiling(length(unique(plot_poly_by_Var1_Var2$data$Variable1))/3)
+fig3.height = 3*ceiling(length(unique(plot_poly_by_snl2_qc$data$Subnational_level2))/3)
 fig3.width = ceiling(3 *
-  0.5*length(unique(plot_poly_by_Var1_Var2$data$Variable2)))
+  0.5*length(unique(plot_poly_by_snl2_qc$data$Quarter_of_Collection)))
 ```
 
 ```{r, fig.width=fig3.width, fig.height=fig3.height, fig.cap="**Figure 3:** Proportions of polyclonal infections by Variable1. 95% confidence intervals are computed using a Fisher exact test."}
 
-if(!is.na(Variable1) & !is.na(Variable2)){
-  
-  plot_poly_by_Var1_Var2
-}
+plot_poly_by_snl2_qc
 
 ```

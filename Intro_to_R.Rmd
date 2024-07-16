@@ -1,7 +1,7 @@
 ---
 title: "Intro to R"
 author: "Paulo Manrique"
-output:
+output: = 
   html_document:
     toc: yes
     number_sections: yes

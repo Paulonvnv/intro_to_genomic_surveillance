@@ -9,7 +9,7 @@ navbar:
     - text: 'Performance of amplicon sequencing data'
       href: Sequencing_Performance.html
     - text: 'Drug Resistance Surveillance'
-      href: Drug_Resistance_Surveillance.html
+      href: Drug_resistance_surveillance.html
     - text: 'Complexity of infection (COI)'
       href: Complexity_of_infection.html
     - text: 'PopStructure and Connectivity'
