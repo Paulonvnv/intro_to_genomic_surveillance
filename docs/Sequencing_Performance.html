@@ -333,7 +333,7 @@ div.tocify {
   <a href="Sequencing_Performance.html">Performance of amplicon sequencing data</a>
 </li>
 <li>
-  <a href="Drug_Resistance_Surveillance.html">Drug Resistance Surveillance</a>
+  <a href="Drug_resistance_surveillance.html">Drug Resistance Surveillance</a>
 </li>
 <li>
   <a href="Complexity_of_infection.html">Complexity of infection (COI)</a>
@@ -567,7 +567,7 @@ class="section level2">
 <h2>Importing and handling tables in CIGAR format in R environment</h2>
 <p>Our first step will be to call all required packages and functions in
 the R environment:</p>
-<pre class="r"><code>source(&#39;~/Documents/Github/intro_to_genomic_surveillance/docs/functions_and_libraries/amplseq_required_libraries.R&#39;)
+<pre class="r"><code>source(&#39;/Users/pam3650/Documents/Github/intro_to_genomic_surveillance/docs/functions_and_libraries/amplseq_required_libraries.R&#39;)
 source(&#39;~/Documents/Github/intro_to_genomic_surveillance/docs/functions_and_libraries/amplseq_functions.R&#39;)
 #sourceCpp(&#39;~/Documents/Github/intro_to_genomic_surveillance/docs/functions_and_libraries/hmmloglikelihood.cpp&#39;)</code></pre>
 <p>In the previous section the Pseudo-CIGAR tables were stored in the
@@ -588,16 +588,41 @@ one folder, you can use the argument
 <code>paths</code>, where <code>list_of_files</code> is a vector with
 the names of all files we want to read.</p>
 <pre class="r"><code>cigar_object = read_cigar_tables(paths = &quot;~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example&quot;, sample_id_pattern = &quot;.&quot;)</code></pre>
-<pre><code>## [1] &quot;Cigar file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/~$Pviv_ampseq_filtered.xlsx/dada2/run_dada2/CIGARVariants_Bfilter.out.tsv not found&quot;
-## [1] &quot;asv2cigar file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/~$Pviv_ampseq_filtered.xlsx/dada2/run_dada2/ASVTable.txt not found&quot;
-## [1] &quot;asv_table file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/~$Pviv_ampseq_filtered.xlsx/dada2/run_dada2/ASVTable.txt not found&quot;
-## [1] &quot;asv_seqs file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/~$Pviv_ampseq_filtered.xlsx/dada2/run_dada2/ASVSeqs.fasta not found&quot;
-## [1] &quot;asv_seqs file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/~$Pviv_ampseq_filtered.xlsx/dada2/run_dada2/zeroReadSamples.txt not found&quot;
+<pre><code>## [1] &quot;Cigar file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/potential_markers.csv/dada2/run_dada2/CIGARVariants_Bfilter.out.tsv not found&quot;
+## [1] &quot;asv2cigar file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/potential_markers.csv/dada2/run_dada2/ASVTable.txt not found&quot;
+## [1] &quot;asv_table file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/potential_markers.csv/dada2/run_dada2/ASVTable.txt not found&quot;
+## [1] &quot;asv_seqs file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/potential_markers.csv/dada2/run_dada2/ASVSeqs.fasta not found&quot;
+## [1] &quot;asv_seqs file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/potential_markers.csv/dada2/run_dada2/zeroReadSamples.txt not found&quot;
+## [1] &quot;Cigar file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered/dada2/run_dada2/CIGARVariants_Bfilter.out.tsv not found&quot;
+## [1] &quot;asv2cigar file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered/dada2/run_dada2/ASVTable.txt not found&quot;
+## [1] &quot;asv_table file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered/dada2/run_dada2/ASVTable.txt not found&quot;
+## [1] &quot;asv_seqs file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered/dada2/run_dada2/ASVSeqs.fasta not found&quot;
+## [1] &quot;asv_seqs file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered/dada2/run_dada2/zeroReadSamples.txt not found&quot;
 ## [1] &quot;Cigar file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered.xlsx/dada2/run_dada2/CIGARVariants_Bfilter.out.tsv not found&quot;
 ## [1] &quot;asv2cigar file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered.xlsx/dada2/run_dada2/ASVTable.txt not found&quot;
 ## [1] &quot;asv_table file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered.xlsx/dada2/run_dada2/ASVTable.txt not found&quot;
 ## [1] &quot;asv_seqs file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered.xlsx/dada2/run_dada2/ASVSeqs.fasta not found&quot;
-## [1] &quot;asv_seqs file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered.xlsx/dada2/run_dada2/zeroReadSamples.txt not found&quot;</code></pre>
+## [1] &quot;asv_seqs file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered.xlsx/dada2/run_dada2/zeroReadSamples.txt not found&quot;
+## [1] &quot;Cigar file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered2/dada2/run_dada2/CIGARVariants_Bfilter.out.tsv not found&quot;
+## [1] &quot;asv2cigar file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered2/dada2/run_dada2/ASVTable.txt not found&quot;
+## [1] &quot;asv_table file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered2/dada2/run_dada2/ASVTable.txt not found&quot;
+## [1] &quot;asv_seqs file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered2/dada2/run_dada2/ASVSeqs.fasta not found&quot;
+## [1] &quot;asv_seqs file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered2/dada2/run_dada2/zeroReadSamples.txt not found&quot;
+## [1] &quot;Cigar file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered2.xlsx/dada2/run_dada2/CIGARVariants_Bfilter.out.tsv not found&quot;
+## [1] &quot;asv2cigar file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered2.xlsx/dada2/run_dada2/ASVTable.txt not found&quot;
+## [1] &quot;asv_table file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered2.xlsx/dada2/run_dada2/ASVTable.txt not found&quot;
+## [1] &quot;asv_seqs file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered2.xlsx/dada2/run_dada2/ASVSeqs.fasta not found&quot;
+## [1] &quot;asv_seqs file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered2.xlsx/dada2/run_dada2/zeroReadSamples.txt not found&quot;
+## [1] &quot;Cigar file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered3/dada2/run_dada2/CIGARVariants_Bfilter.out.tsv not found&quot;
+## [1] &quot;asv2cigar file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered3/dada2/run_dada2/ASVTable.txt not found&quot;
+## [1] &quot;asv_table file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered3/dada2/run_dada2/ASVTable.txt not found&quot;
+## [1] &quot;asv_seqs file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered3/dada2/run_dada2/ASVSeqs.fasta not found&quot;
+## [1] &quot;asv_seqs file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered3/dada2/run_dada2/zeroReadSamples.txt not found&quot;
+## [1] &quot;Cigar file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered3.xlsx/dada2/run_dada2/CIGARVariants_Bfilter.out.tsv not found&quot;
+## [1] &quot;asv2cigar file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered3.xlsx/dada2/run_dada2/ASVTable.txt not found&quot;
+## [1] &quot;asv_table file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered3.xlsx/dada2/run_dada2/ASVTable.txt not found&quot;
+## [1] &quot;asv_seqs file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered3.xlsx/dada2/run_dada2/ASVSeqs.fasta not found&quot;
+## [1] &quot;asv_seqs file ~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered3.xlsx/dada2/run_dada2/zeroReadSamples.txt not found&quot;</code></pre>
 <p>Use the function <code>slotNames</code> to visualize the slots that
 the <code>cigar_object</code> has:</p>
 <pre class="r"><code>slotNames(cigar_object)</code></pre>
@@ -1237,11 +1262,18 @@ samples that are retained in each category.
 </div>
 <div id="export-the-filtered-ampseq_object" class="section level2">
 <h2>Export the filtered ampseq_object</h2>
+<p>As Excel file</p>
 <pre class="r"><code>write_ampseq(ampseq_object, name = &#39;~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered.xlsx&#39;, format = &#39;excel&#39;)</code></pre>
 <p>The exported ampseq object can also be uploaded in R to be used for
 other pipelines</p>
 <pre class="r"><code>ampseq_object2 = read_ampseq(file = &#39;~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered.xlsx&#39;, 
                    format = &#39;excel&#39;)</code></pre>
+<p>As csv files</p>
+<pre class="r"><code>write_ampseq(ampseq_object, name = &#39;~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered&#39;, format = &#39;csv&#39;)</code></pre>
+<p>The exported ampseq object can also be uploaded in R to be used for
+other pipelines</p>
+<pre class="r"><code>ampseq_object3 = read_ampseq(file = &#39;~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered&#39;, 
+                   format = &#39;csv&#39;)</code></pre>
 </div>
 </div>
 

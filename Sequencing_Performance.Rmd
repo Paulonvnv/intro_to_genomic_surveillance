@@ -223,7 +223,7 @@ Our first step will be to call all required packages and functions in
 the R environment:
 
 ```{r 'Loading required packages and functions'}
-source('~/Documents/Github/intro_to_genomic_surveillance/docs/functions_and_libraries/amplseq_required_libraries.R')
+source('/Users/pam3650/Documents/Github/intro_to_genomic_surveillance/docs/functions_and_libraries/amplseq_required_libraries.R')
 source('~/Documents/Github/intro_to_genomic_surveillance/docs/functions_and_libraries/amplseq_functions.R')
 #sourceCpp('~/Documents/Github/intro_to_genomic_surveillance/docs/functions_and_libraries/hmmloglikelihood.cpp')
 ```
@@ -324,12 +324,13 @@ cigar_object@metadata %<>% mutate(
 
 Use View again to visualize those changes.
 
-The cigar_table is in wide format, and the alleles corresponding to the sample target are not in consecutive order. Because of that e are going to convert our
-cigar_table to a more manageable (easy to read for the user) format
-called ampseq format, where amplicons or genes are going to be in
-columns, samples in rows, and the allele in cigar format is going to be
-in each cell of the matrix together with the read count of that allele
-in the sample.
+The cigar_table is in wide format, and the alleles corresponding to the
+sample target are not in consecutive order. Because of that e are going
+to convert our cigar_table to a more manageable (easy to read for the
+user) format called ampseq format, where amplicons or genes are going to
+be in columns, samples in rows, and the allele in cigar format is going
+to be in each cell of the matrix together with the read count of that
+allele in the sample.
 
 $\begin{array}{c|c:c:c:c} \text{sampleID}&Gene_1&Gene_2&...& Gene_m\\ \hline ID_1 & Allele_{i_{i \in Alleles_{Gene_1}}}\text{:Read count} &&& \\ \hdashline ... &&&&\\ \hdashline ID_n &&&& \end{array}$
 
@@ -340,28 +341,34 @@ set of markers and their names (in a column named `amplicon`). This
 argument is optional, and in case is `NULL`, the name of the amplicons
 will be extracted from the columns in the `cigar_object`, but
 information regarding chormosome location (information required to
-estimate relatedness under the hmmIBD algorithm) and length of the amplicon
-will be missing. The next arguments are `min_abd` and `min_ratio`, which
-are the minimum abundance (minimum read count) required to call an
-allele and the minimum ratio between the minor and major alleles in a
-polyclonal sample. By default these two arguments are 10 and 0.1
-respectively. The last argument is `remove_controls`, by default is
-`FALSE`, but if change to `TRUE` the information of the controls will be
-stored in a separated slot. Thus, this function automatically
-differentiate between controls and samples of interest, and its output
-is a `ampseq_object` S4 list with 11 slots: `gt` where the genotypic
-information of the samples of interest is stored in a `ampseq` format; the `asv_table` with summary metrics and the cigar strings for each asv (allele); the `asv_seqs` list that store the nucleotide sequence of each asv,
-the `metadata` of the samples of interest; `controls` with all the
-information of the controls; `markers` containing the information of the
-markers such as the chromosome location; and other empty slots required
-for the next steps such as `loci_performance` and `pop_summary`.
+estimate relatedness under the hmmIBD algorithm) and length of the
+amplicon will be missing. The next arguments are `min_abd` and
+`min_ratio`, which are the minimum abundance (minimum read count)
+required to call an allele and the minimum ratio between the minor and
+major alleles in a polyclonal sample. By default these two arguments are
+10 and 0.1 respectively. The last argument is `remove_controls`, by
+default is `FALSE`, but if change to `TRUE` the information of the
+controls will be stored in a separated slot. Thus, this function
+automatically differentiate between controls and samples of interest,
+and its output is a `ampseq_object` S4 list with 11 slots: `gt` where
+the genotypic information of the samples of interest is stored in a
+`ampseq` format; the `asv_table` with summary metrics and the cigar
+strings for each asv (allele); the `asv_seqs` list that store the
+nucleotide sequence of each asv, the `metadata` of the samples of
+interest; `controls` with all the information of the controls; `markers`
+containing the information of the markers such as the chromosome
+location; and other empty slots required for the next steps such as
+`loci_performance` and `pop_summary`.
 
-For the next steps we are going to convert the cigar_object into an ampseq_object in two different ways:
+For the next steps we are going to convert the cigar_object into an
+ampseq_object in two different ways:
 
-1. Keeping controls and all asvs observed in the data set.
-2. Removing controls and asvs with less than 5 reads of support.
+1.  Keeping controls and all asvs observed in the data set.
+2.  Removing controls and asvs with less than 5 reads of support.
 
-But first lest upload the information of the markers into the R environment:
+But first lest upload the information of the markers into the R
+environment:
+
 ```{r}
 markers = read.csv('~/Documents/Github/intro_to_genomic_surveillance/docs/reference/Pviv_P01/PvGTSeq271_markersTable.csv')
 ```
@@ -373,7 +380,9 @@ ampseq_object_abd1 = cigar2ampseq(cigar_object, markers = markers, min_abd = 1, 
 ampseq_object = cigar2ampseq(cigar_object, markers = markers, min_abd = 5, min_ratio = 0.1, remove_controls = T)
 ```
 
-The table of the markers contains a list of 271 amplicons, however the samples were sequenced using only 249. Filter the ampseq objects using the function filter_loci
+The table of the markers contains a list of 271 amplicons, however the
+samples were sequenced using only 249. Filter the ampseq objects using
+the function filter_loci
 
 ```{r}
 ampseq_object_abd1 = filter_loci(ampseq_object_abd1,
@@ -388,17 +397,20 @@ ampseq_object = filter_loci(ampseq_object,
 Sample success is defined as the percentage of samples which amplify a
 specific percentage of loci given the allele detection coverage
 threshold or number of paired reads that support the allele or ASV in a
-sample. Here we are going to show 6 different coverage thresholds: 1,
-5, 10, 20, 50, and 100 paired reads.
+sample. Here we are going to show 6 different coverage thresholds: 1, 5,
+10, 20, 50, and 100 paired reads.
 
 ### Overall sequencing yield
 
 Measure the read coverage by using the function get_ReadDepth_coverage:
+
 ```{r}
 ReadDepth_coverage = get_ReadDepth_coverage(ampseq_object_abd1, variable = NULL)
 ```
 
-For each sample, calculates how many loci has a read depth equals or greater than 1, 5, 10, 20, 50, or 100:
+For each sample, calculates how many loci has a read depth equals or
+greater than 1, 5, 10, 20, 50, or 100:
+
 ```{r}
 sample_performance = ReadDepth_coverage$plot_read_depth_heatmap$data %>%
     mutate(Read_depth = case_when(
@@ -418,7 +430,12 @@ sample_performance = ReadDepth_coverage$plot_read_depth_heatmap$data %>%
 
 ```
 
-Generate a plot showing the percentage of loci (amplicon or marker) which contains alleles that pass the thresholds in the x-axis, and the percentage of samples which amplify a specific percentage of loci given the allele detection thresholds in the y-axis. Include a vertical line that indicates samples that has amplify at least 50% of the loci with the especific read depth coverage.
+Generate a plot showing the percentage of loci (amplicon or marker)
+which contains alleles that pass the thresholds in the x-axis, and the
+percentage of samples which amplify a specific percentage of loci given
+the allele detection thresholds in the y-axis. Include a vertical line
+that indicates samples that has amplify at least 50% of the loci with
+the especific read depth coverage.
 
 ```{r}
 plot_precentage_of_samples_over_min_abd = sample_performance %>%
@@ -658,8 +675,8 @@ off-target ASV and the reference template. For that reason in this step
 we use the density of of variant sites (dVSITES_ij) in order to identify
 alleles that are potentially off-target products. The other parameters
 explained above can also be included to constraint more the definition.
-The filtering criteria can be specified with the argument
-"mask_formula" (`maskt_formula = "dVSITES_ij >= 0.3"`).
+The filtering criteria can be specified with the argument "mask_formula"
+(`maskt_formula = "dVSITES_ij >= 0.3"`).
 
 Run the function `frac_ofHet_pAlt_byAllele`:
 
@@ -688,6 +705,7 @@ plot_off_target_stats
 ```
 
 Identify how many alleles would be removed using a filter of 0.3.
+
 ```{r}
 
 n_off_target_alleles = off_target_stats[off_target_stats$dVSITES_ij >= 0.3,][['Allele']]
@@ -723,7 +741,7 @@ criteria can be specified in Terra with the argument
 Identified Flanking INDELs are masked, which means the the internal
 region of the ASV is kept to define the allele.
 
-Run the function  again `frac_ofHet_pAlt_byAllele`:
+Run the function again `frac_ofHet_pAlt_byAllele`:
 
 ```{r}
 flanking_INDEL_stats = frac_ofHet_pAlt_byAllele(ampseq_object, 
@@ -761,13 +779,13 @@ plot_flanking_INDEL_stats = flanking_INDEL_stats %>%
 plot_flanking_INDEL_stats
 ```
 
-Identify how many alleles would be removed using `h_ij >= 0.66 & h_ijminor >= 0.66`:
+Identify how many alleles would be removed using
+`h_ij >= 0.66 & h_ijminor >= 0.66`:
 
 ```{r}
 n_flanking_INDEL_alleles = flanking_INDEL_stats[flanking_INDEL_stats$flanking_INDEL == TRUE & flanking_INDEL_stats$h_ij >= 0.66 & flanking_INDEL_stats$h_ijminor >= 0.66, ][['Allele']]
 print(paste0(length(n_flanking_INDEL_alleles), ' allele(s) match(es) the criteria to identify products with flanking INDELs'))
 ```
-
 
 ```{r, eval = FALSE}
 View(
@@ -834,17 +852,16 @@ plot_PCR_errors_stats = PCR_errors_stats %>%
            color = 'h_ijminor')
 ```
 
-
 ```{r, fig.width=7, fig.height=5, fig.cap="**Figure 6:** Identification and removal of stochastic PCR errors. The scatter plot shows the distribution of the prevalence of the alternative allele (p_ij), the frequency of the alternative allele as heterozygous (h_ij), and the frequency of the alternative allele as minor allele (h_ijminor). The horizontal panels are defined based on the threshold stablished for h_ijminor."}
 plot_PCR_errors_stats
 ```
 
 How many alleles didn't pass the threshold
+
 ```{r}
 n_PCR_errors_alleles = PCR_errors_stats[PCR_errors_stats$h_ij >= 0.66 & PCR_errors_stats$h_ijminor >= 0.66, ][['Allele']]
 print(paste0(length(n_PCR_errors_alleles), ' allele(s) match(es) the criteria to identify PCR_errors'))
 ```
-
 
 ```{r, eval = FALSE}
 View(
@@ -881,7 +898,6 @@ ReadDepth_coverage$plot_read_depth_heatmap
 
 ### Locus performance across different countries
 
-
 ```{r}
 
 all_loci_amplification_rate = locus_amplification_rate(ampseq_object, threshold = 0.65, strata = 'Country', update_loci = F)
@@ -898,7 +914,8 @@ all_loci_amplification_rate
 
 ```
 
-Keep loci with more than 50% of amplified samples in at least one of the countries:
+Keep loci with more than 50% of amplified samples in at least one of the
+countries:
 
 ```{r}
 
@@ -909,6 +926,7 @@ ampseq_object = locus_amplification_rate(ampseq_object, threshold = 0.5, strata 
 ### Retention of samples for subsequent analysis
 
 Use the function `sample_amplification_rate`:
+
 ```{r}
 samples_amplification_rate = sample_amplification_rate(ampseq_object, threshold = 0.8, strata = 'Country', update_samples = F)
 ```
@@ -922,20 +940,39 @@ fig9.height = 2*length(unique(samples_amplification_rate$data$Strata))
 samples_amplification_rate
 
 ```
+
 Keep samples with at least 50% of amplified loci
+
 ```{r}
 ampseq_object = sample_amplification_rate(ampseq_object, threshold = 0.5, strata = 'Country', update_samples = T)
 ```
 
 ## Export the filtered ampseq_object
 
+As Excel file
+
 ```{r}
 write_ampseq(ampseq_object, name = '~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered.xlsx', format = 'excel')
 ```
 
-The exported ampseq object can also be uploaded in R to be used for other pipelines
+The exported ampseq object can also be uploaded in R to be used for
+other pipelines
 
 ```{r}
 ampseq_object2 = read_ampseq(file = '~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered.xlsx', 
                    format = 'excel')
+```
+
+As csv files
+
+```{r}
+write_ampseq(ampseq_object, name = '~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered', format = 'csv')
+```
+
+The exported ampseq object can also be uploaded in R to be used for
+other pipelines
+
+```{r}
+ampseq_object3 = read_ampseq(file = '~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered', 
+                   format = 'csv')
 ```

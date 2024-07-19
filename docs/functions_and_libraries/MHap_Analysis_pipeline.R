@@ -2337,7 +2337,7 @@ if(!is.null(ibd_thres)){
     if(is.null(pairwise_relatedness_table)){
       pairwise_relatedness = NULL
       
-      for(w in 11:99){
+      for(w in nChunks){
         start = Sys.time()
         pairwise_relatedness = rbind(pairwise_relatedness,
                                      pairwise_hmmIBD(ampseq_object, parallel = parallel, w = w, n = nChunks))

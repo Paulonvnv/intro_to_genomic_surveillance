@@ -107,7 +107,7 @@ source('~/Documents/Github/intro_to_genomic_surveillance/docs/functions_and_libr
 #sourceCpp('~/Documents/Github/intro_to_genomic_surveillance/docs/functions_and_libraries/hmmloglikelihood.cpp')
 ```
 
-2. Read the ampseq_object in excel format:
+2. Read the ampseq_object in csv format:
 
 ```{r}
 ampseq_object = read_ampseq(file = '~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered2.xlsx', 
@@ -204,7 +204,10 @@ plot_poly_by_pop
 
 ```
 
+
 ### Add information to the ampseq object and save
+
+
 
 ```{r}
 ampseq_object@metadata = left_join(ampseq_object@metadata,
@@ -217,7 +220,13 @@ ampseq_object@loci_performance = left_join(ampseq_object@loci_performance,
                                            by = join_by(loci == locus)
                                            )
 
+# As an Excel file
+
 write_ampseq(ampseq_object, format = 'excel', name = '~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered3.xlsx')
+
+# As csv files
+
+write_ampseq(ampseq_object, format = 'csv', name = '~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pviv_example/Pviv_ampseq_filtered3')
 
 ```
 
@@ -225,14 +234,14 @@ write_ampseq(ampseq_object, format = 'excel', name = '~/Documents/Github/intro_t
 ## Polyclonal infections in P. falciparum
 
 
-2. Read the ampseq_object in excel format:
+Read the ampseq_object in csv format:
 
 ```{r}
-pfal_ampseq_object = read_ampseq(file = '~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pfal_example/Pfal_ampseq_filtered.xlsx', 
-                   format = 'excel')
+pfal_ampseq_object = read_ampseq(file = '~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pfal_example/Pfal_ampseq_filtered', 
+                   format = 'csv')
 ```
 
-3. Identify polyclonal infections by Subnational_level2
+Identify polyclonal infections by Subnational_level2
 
 ```{r}
 poly_by_snl2 = get_polygenomic(ampseq_object = pfal_ampseq_object, 

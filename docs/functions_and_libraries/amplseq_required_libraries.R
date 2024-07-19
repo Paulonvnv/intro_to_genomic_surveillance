@@ -111,12 +111,12 @@ if(!require(ggpubr)){
   library(ggpubr)
 }
 
-if(!require(doMC)){
-  install.packages('doMC')
-  library(doMC)
-}else{
-  library(doMC)
-}
+# if(!require(doMC)){
+#   install.packages('doMC')
+#   library(doMC)
+# }else{
+#   library(doMC)
+# }
 
 if(!require(svMisc)){
   install.packages('svMisc')

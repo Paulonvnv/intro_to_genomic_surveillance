@@ -48,7 +48,7 @@ load(params$RData_image)
 ### Pairwise relatedness comparisons within categories of Variable1
 
 For this report all possible pairwise IBD comparisons within samples
-from different categories of Variable1 and Variable2 are computed, and
+from different categories of Subnational_level1 and Quarter_of_Collection are computed, and
 the results are shown in the following table:
 
 ```{r}

@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Neafsey Lab" />
+
+
+<title>Genetic Relatedness (IBD) and Connectivity</title>
+
+<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Amplicon Sequencing Analysis</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="Intro_to_R.html">Intro to R</a>
+</li>
+<li>
+  <a href="Sequencing_Performance.html">Performance of amplicon sequencing data</a>
+</li>
+<li>
+  <a href="Drug_resistance_surveillance.html">Drug Resistance Surveillance</a>
+</li>
+<li>
+  <a href="Complexity_of_infection.html">Complexity of infection (COI)</a>
+</li>
+<li>
+  <a href="PopStructure_and_Connectivity.html">PopStructure and Connectivity</a>
+</li>
+<li>
+  <a href="IBD_and_Tranmission.html">Genetic Relatedness (IBD) and Tranmission</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Genetic Relatedness (IBD) and
+Connectivity</h1>
+<h4 class="author">Neafsey Lab</h4>
+
+</div>
+
+
+<p>The genetic relatedness between individual parasite haplotypes and
+among parasite populations has several practical uses in the study of
+malaria. For example, relatedness information can help determine the
+geographic origin of imported infections, define the extent to which
+parasites are dispersing or are contained within landscapes, and
+identify whether specific strains are being selected for over time.
+Relatedness information is also very helpful in understanding
+longitudinal (within-individual) infection dynamics. In the case of
+<em>P. vivax</em>, for example, it can distinguish whether infection
+represents newly acquired parasites, recrudescence after treatment, or
+relapse from longer-lasting hypnozoite reservoirs. Relatedness
+information can also help resolve polyclonality signals, i.e., clarify
+the number of different haplotypes co-infecting individual patients.</p>
+<p>Relatedness is defined as the probability that, at any locus in the
+genome, the alleles sampled from two different individuals are identical
+by descent (<span class="math inline">\(IBD\)</span>). Genetic markers
+used for this purpose include SNPs, microsatellites, and (increasingly)
+amplicon micro-haplotypes (MHAP). Relatedness can be estimated using a
+Hidden Markov Model approach implemented in the <a
+href="https://github.com/aimeertaylor/paneljudge/tree/master">R package
+paneljudge</a> (see mathematical framework in <a
+href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6707449/">AR Taylor
+et al. 2019</a>). In this package, relatedness (<span
+class="math inline">\(r\)</span>) is estimated as a function of the
+haplotype of the two sampled parasites (<span
+class="math inline">\(Y^{(i)}\)</span> and <span
+class="math inline">\(Y^{(j)}\)</span>, where <span
+class="math inline">\(i\)</span> and <span
+class="math inline">\(j\)</span> denote two different sampled genotypes
+from the population), the frequency of the alleles in the population
+(<span class="math inline">\(f_t(g)\)</span>, where <span
+class="math inline">\(t\)</span> denotes locus), the physical distance
+(<span class="math inline">\(d_t\)</span>, in base-pairs) between
+successively analyzed loci (<span class="math inline">\(t-1\)</span> and
+<span class="math inline">\(t\)</span>), the recombination rate (<span
+class="math inline">\(\rho\)</span>), a switching rate of the Markov
+chain (<span class="math inline">\(k\)</span>), and a constant
+genotyping error rate (<span
+class="math inline">\(\varepsilon\)</span>).</p>
+<div id="pairwise-relatedness-comparisons-between-categories"
+class="section level3">
+<h3>Pairwise relatedness comparisons between categories</h3>
+<p>For this report all possible pairwise IBD comparisons between samples
+from different categories of Variable1 and Variable2 are computed, and
+the results are shown in the following table:</p>
+<pre class="r"><code>source(&#39;~/Documents/Github/intro_to_genomic_surveillance/docs/functions_and_libraries/amplseq_required_libraries.R&#39;)
+source(&#39;~/Documents/Github/intro_to_genomic_surveillance/docs/functions_and_libraries/amplseq_functions.R&#39;)
+#sourceCpp(&#39;~/Documents/Github/intro_to_genomic_surveillance/docs/functions_and_libraries/hmmloglikelihood.cpp&#39;)</code></pre>
+<p>Read the ampseq_object in csv format:</p>
+<pre class="r"><code>ampseq_object = read_ampseq(file = &#39;~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pfal_example/Pfal_ampseq_filtered&#39;, 
+                   format = &#39;csv&#39;)</code></pre>
+<p>Run the function <code>pairwise_hmmIBD</code>:</p>
+<pre class="r"><code>pairwise_relatedness_table = &#39;~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pfal_example/pairwise_relatedness.csv&#39;
+
+if(!file.exists(pairwise_relatedness_table)){
+      pairwise_relatedness = NULL
+      
+      nChunks = 500
+      
+      for(w in nChunks){
+        start = Sys.time()
+        pairwise_relatedness = rbind(pairwise_relatedness,
+                                     pairwise_hmmIBD(ampseq_object, parallel = TRUE, w = w, n = nChunks))
+        time_diff = Sys.time() - start
+        
+        print(paste0(&#39;step &#39;, w, &#39; done in &#39;, time_diff, &#39; secs&#39;))
+        
+      }
+      
+      write.csv(pairwise_relatedness,
+                &#39;~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pfal_example/pairwise_relatedness.csv&#39;,
+                quote = FALSE,
+                row.names = FALSE)
+      
+    }else{
+      
+      pairwise_relatedness = read.csv(pairwise_relatedness_table)
+      
+    }</code></pre>
+<p>Plot the distribution of relatedness between sites using the function
+<code>plot_relatedness_distribution</code></p>
+<pre class="r"><code>plot_relatedness_distribution_between = plot_relatedness_distribution(
+      pairwise_relatedness = pairwise_relatedness,
+      metadata = ampseq_object@metadata,
+      Population = &#39;Subnational_level2&#39;,
+      fill_color = rep(&#39;gray50&#39;, length(unique(ampseq_object@metadata[[&#39;Subnational_level2&#39;]]))*(length(unique(ampseq_object@metadata[[&#39;Subnational_level2&#39;]]))-1)/2),
+      type_pop_comparison = &#39;between&#39;,
+      ncol = 3,
+      pop_levels = NULL
+    )</code></pre>
+<pre class="r"><code>View(plot_relatedness_distribution_between$relatedness)</code></pre>
+<p>The distribution of pairwise genetic relatedness values is presented
+using histograms as follows:</p>
+<pre class="r"><code>plot_relatedness_distribution_between$plot</code></pre>
+<div class="figure">
+<img src="PopStructure_and_Connectivity_files/figure-html/unnamed-chunk-6-1.png" alt="**Figure 1:** Pairwise IBD distribution between categories of Variable1 (panels). The x-axis shows genetic relatedness values, ranging from 0 (unrelated) to 1 (clonal). The y-axis shows the number of pairwise comparisons corresponding to each of these relatedness values. The dotted vertical line represents the median genetic relatedness in the total dataset (including both within and between-population comparisons)." width="960" />
+<p class="caption">
+<strong>Figure 1:</strong> Pairwise IBD distribution between categories
+of Variable1 (panels). The x-axis shows genetic relatedness values,
+ranging from 0 (unrelated) to 1 (clonal). The y-axis shows the number of
+pairwise comparisons corresponding to each of these relatedness values.
+The dotted vertical line represents the median genetic relatedness in
+the total dataset (including both within and between-population
+comparisons).
+</p>
+</div>
+</div>
+<div
+id="fraction-of-highly-related-comparisons-between-categories-of-variable1"
+class="section level3">
+<h3>Fraction of highly related comparisons between categories of
+Variable1</h3>
+<p>Based on the defined threshold (0.99), highly related pairwise
+comparisons between categories in Subnational_level2 are counted and
+proportions with their 95% CI (Fisher exact test) are calculated.</p>
+<pre class="r"><code>plot_frac_highly_related_between = plot_frac_highly_related(
+      pairwise_relatedness = pairwise_relatedness,
+      metadata = ampseq_object@metadata,
+      Population = &#39;Subnational_level2&#39;,
+      fill_color = rep(&#39;gray50&#39;, length(unique(ampseq_object@metadata[[&#39;Subnational_level2&#39;]]))*(length(unique(ampseq_object@metadata[[&#39;Subnational_level2&#39;]]))-1)/2),
+      threshold = 0.99,
+      type_pop_comparison = &#39;between&#39;,
+      pop_levels = NULL)</code></pre>
+<p>These values are presented in the following table and in Figure
+2:</p>
+<pre class="r"><code>View(plot_frac_highly_related_between$highly_related_table)</code></pre>
+<pre class="r"><code>plot_frac_highly_related_between$plot</code></pre>
+<div class="figure">
+<img src="PopStructure_and_Connectivity_files/figure-html/unnamed-chunk-10-1.png" alt="**Figure 2:** Fraction of highly related pairwise comparisons (IBD &gt;= ibd_thres) between categories of Variable1 (x-axis). 95% confidence intervals are computed using a Fisher exact test." width="960" />
+<p class="caption">
+<strong>Figure 2:</strong> Fraction of highly related pairwise
+comparisons (IBD &gt;= ibd_thres) between categories of Variable1
+(x-axis). 95% confidence intervals are computed using a Fisher exact
+test.
+</p>
+</div>
+</div>
+<div
+id="fraction-of-highly-related-comparisons-between-categories-of-variable1-over-variable2"
+class="section level3">
+<h3>Fraction of highly related comparisons between categories of
+Variable1 over Variable2</h3>
+<p>Highly related pairwise comparisons between categories in
+Subnational_level2 and Quarter_of_Collection are also counted and
+proportions with their 95% CI (Fisher exact test) are calculated.</p>
+<pre class="r"><code>plot_frac_highly_related_overtime_between = plot_frac_highly_related_over_time(
+        pairwise_relatedness = pairwise_relatedness,
+        metadata = ampseq_object@metadata,
+        Population = c(&#39;Subnational_level2&#39;, &#39;Quarter_of_Collection&#39;),
+        fill_color = rep(&#39;gray50&#39;, length(unique(ampseq_object@metadata[[&#39;Subnational_level2&#39;]]))*(length(unique(ampseq_object@metadata[[&#39;Subnational_level2&#39;]]))-1)/2),
+        threshold = 0.99,
+        type_pop_comparison = &#39;between&#39;,
+        ncol = 3,
+        pop_levels = NULL)</code></pre>
+<p>These values are presented in the following table and in Figures
+3-4:</p>
+<pre class="r"><code>View(plot_frac_highly_related_overtime_between$frac_highly_related)</code></pre>
+<pre class="r"><code>plot_frac_highly_related_overtime_between$plot_IBD_correlation_matrix</code></pre>
+<div class="figure">
+<img src="PopStructure_and_Connectivity_files/figure-html/unnamed-chunk-14-1.png" alt="**Figure 3:** Heatmap matrix of the fraction of highly related pairwise comparisons (IBD &gt;= ibd_thres) between categories of Variable1 and Variable2. The color scale indicates the fraction of highly related samples (increasing with higher intensities of red). The diagonal in the matrix represents pairwise comparisons within categories." width="1440" />
+<p class="caption">
+<strong>Figure 3:</strong> Heatmap matrix of the fraction of highly
+related pairwise comparisons (IBD &gt;= ibd_thres) between categories of
+Variable1 and Variable2. The color scale indicates the fraction of
+highly related samples (increasing with higher intensities of red). The
+diagonal in the matrix represents pairwise comparisons within
+categories.
+</p>
+</div>
+<pre class="r"><code>plot_frac_highly_related_overtime_between$plot_frac_highly_related</code></pre>
+<div class="figure">
+<img src="PopStructure_and_Connectivity_files/figure-html/unnamed-chunk-16-1.png" alt="**Figure 4:** Bar plot of the fraction of highly related pairwise comparisons (IBD &gt;= ibd_thres) between categories of Variable1 (panels) and Variable2 (x-axis). 95% confidence intervals are computed using a Fisher exact test." width="1344" />
+<p class="caption">
+<strong>Figure 4:</strong> Bar plot of the fraction of highly related
+pairwise comparisons (IBD &gt;= ibd_thres) between categories of
+Variable1 (panels) and Variable2 (x-axis). 95% confidence intervals are
+computed using a Fisher exact test.
+</p>
+</div>
+<p>Finally, let’s create PCoA and network plots summarizing the genetic
+relatedness between samples.</p>
+<pre class="r"><code>evectors_IBD = IBD_evectors(ampseq_object = ampseq_object,
+                                relatedness_table = pairwise_relatedness,
+                                k = length(unique(ampseq_object@metadata$Sample_id)),
+                                Pop = &#39;Subnational_level2&#39;, q = 2)
+
+col_vector = brewer.pal(5, &#39;Accent&#39;)
+
+IBD_PCA = evectors_IBD$eigenvector %&gt;% ggplot(aes(x = PC1, y = PC2, color = Subnational_level2))+
+      geom_point(alpha = .7, size = 2) +
+      stat_ellipse(level = .6)+
+      scale_color_manual(values = col_vector)+
+      theme_bw()+
+      labs(x = paste0(&#39;1st PCo (&#39;, round(evectors_IBD$contrib[1],1), &#39;%)&#39;),
+           y = paste0(&#39;2nd PCo (&#39;, round(evectors_IBD$contrib[2],1), &#39;%)&#39;),
+           color = &#39;Countries&#39;)</code></pre>
+<pre class="r"><code>IBD_PCA</code></pre>
+<div class="figure">
+<img src="PopStructure_and_Connectivity_files/figure-html/unnamed-chunk-18-1.png" alt="**Figure 5:** Principal coordinate analysis (PCoA) based on the inverse of genetic relatedness (1 - IBD). Colors are randomly assigned based on the categories of Variable1. Each dot represents a sample." width="576" />
+<p class="caption">
+<strong>Figure 5:</strong> Principal coordinate analysis (PCoA) based on
+the inverse of genetic relatedness (1 - IBD). Colors are randomly
+assigned based on the categories of Variable1. Each dot represents a
+sample.
+</p>
+</div>
+<pre class="r"><code>plot_network(pairwise_relatedness,
+             threshold = 0.99,
+             metadata = ampseq_object@metadata,
+             sample_id = &#39;Sample_id&#39;,
+             group_by = &#39;Subnational_level2&#39;,
+             levels = levels(as.factor(
+               ampseq_object@metadata[[&#39;Subnational_level2&#39;]])),
+             colors = col_vector
+             )</code></pre>
+<div class="figure">
+<img src="PopStructure_and_Connectivity_files/figure-html/unnamed-chunk-19-1.png" alt="**Figure 6:** Network representation of pairwise genetic relatedness (IBD), Colors are randomly assigned based on the categories of Variable1. Each dot represents a sample and the lines connect samples with IBD &gt;= ibd_thres." width="576" />
+<p class="caption">
+<strong>Figure 6:</strong> Network representation of pairwise genetic
+relatedness (IBD), Colors are randomly assigned based on the categories
+of Variable1. Each dot represents a sample and the lines connect samples
+with IBD &gt;= ibd_thres.
+</p>
+</div>
+<pre><code>## $network_object
+## IGRAPH eb1377a UN-- 1146 44031 -- 
+## + attr: name (v/c)
+## + edges from eb1377a (vertex names):
+##  [1] ID00001--ID00002 ID00001--ID00003 ID00001--ID00007 ID00001--ID00008
+##  [5] ID00001--ID00009 ID00001--ID00010 ID00001--ID00011 ID00001--ID00014
+##  [9] ID00001--ID00015 ID00001--ID00019 ID00001--ID00020 ID00001--ID00023
+## [13] ID00001--ID00024 ID00001--ID00027 ID00001--ID00028 ID00001--ID00029
+## [17] ID00001--ID00032 ID00001--ID00040 ID00001--ID00042 ID00001--ID00044
+## [21] ID00001--ID00046 ID00001--ID00048 ID00001--ID00050 ID00001--ID00252
+## [25] ID00001--ID00255 ID00001--ID00257 ID00001--ID00260 ID00001--ID00816
+## [29] ID00001--ID00817 ID00001--ID00818 ID00001--ID00819 ID00001--ID00820
+## + ... omitted several edges
+## 
+## $plot_network
+## NULL</code></pre>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

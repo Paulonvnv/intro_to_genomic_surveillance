@@ -115,7 +115,7 @@ read_cigar_tables = function(paths = NULL,
           rownames(ZeroReadSamples) = paste(1:length(ZeroReadSamples_names), Run, ZeroReadSamples_names, sep = '/')
           
           cigar_tables[[Run]][['cigar_table']] = rbind(cigar_tables[[Run]][['cigar_table']],
-                                                                     ZeroReadSamples)
+                                                       ZeroReadSamples)
           
         }
         
@@ -132,7 +132,7 @@ read_cigar_tables = function(paths = NULL,
     
     for(file in 1:length(cigar_files)){
       cigar_run = read.table(cigar_files[file], header = T, check.names = FALSE
-                             )
+      )
       #samples = gsub('_S\\d+$','', cigar_run[,1])
       samples = cigar_run[,1]
       samples[!grepl(sample_id_pattern,samples)] = paste0(samples[!grepl(sample_id_pattern,samples)], '_file', which(cigar_files == cigar_files[file]))
@@ -174,19 +174,19 @@ read_cigar_tables = function(paths = NULL,
           ZeroReadSamples = read.table(zero_read_sample_list, header = T)
           
           ZeroReadSamples = matrix(0, nrow = length(ZeroReadSamples[[1]]),
-                 ncol = ncol(cigar_tables[[cigar_files[file]]][['cigar_table']]),
-                 dimnames = list(paste((nrow(cigar_tables[[cigar_files[file]]][['cigar_table']]) + 
-                                          1):(nrow(cigar_tables[[cigar_files[file]]][['cigar_table']]) + 
-                                                length(ZeroReadSamples[[1]])), 
-                                       cigar_files[file], 
-                                       gsub('_prim_1.fq.gz$', '', ZeroReadSamples[[1]]), sep = '/'),
-                                 
-                                 colnames(cigar_tables[[cigar_files[file]]][['cigar_table']]))
-                 )
+                                   ncol = ncol(cigar_tables[[cigar_files[file]]][['cigar_table']]),
+                                   dimnames = list(paste((nrow(cigar_tables[[cigar_files[file]]][['cigar_table']]) + 
+                                                            1):(nrow(cigar_tables[[cigar_files[file]]][['cigar_table']]) + 
+                                                                  length(ZeroReadSamples[[1]])), 
+                                                         cigar_files[file], 
+                                                         gsub('_prim_1.fq.gz$', '', ZeroReadSamples[[1]]), sep = '/'),
+                                                   
+                                                   colnames(cigar_tables[[cigar_files[file]]][['cigar_table']]))
+          )
           
           cigar_tables[[cigar_files[file]]][['cigar_table']] = rbind(cigar_tables[[cigar_files[file]]][['cigar_table']],
                                                                      ZeroReadSamples
-                                                                     )
+          )
           
           
           #rm(list = c("asv2cigar_run", "asv_table_run", "asv_seqs"))
@@ -334,7 +334,7 @@ read_cigar_tables = function(paths = NULL,
       cigar_strings_replacements2 = paste(gsub(',.+$', '', cigar_strings2),
                                           cigar_strings_replacements2,
                                           sep = ','
-                                          )
+      )
       
       for(cigar_string in 1:length(cigar_strings2)){
         
@@ -777,7 +777,7 @@ join_ampseq = function(ampseq_obj_list = NULL){
 
 # write_ampseq----
 
-write_ampseq = function(ampseq_object, format = 'excel', name = 'wb.xlsx'){
+write_ampseq = function(ampseq_object, format = c('excel', 'csv', 'json'), name = 'wb.xlsx'){
   
   if(format == 'excel'){
     
@@ -829,11 +829,63 @@ write_ampseq = function(ampseq_object, format = 'excel', name = 'wb.xlsx'){
                        sheet = temp_slot,
                        header = T)
       }
-    
+      
       
     }
     
     saveWorkbook(excel_wb)
+    
+  }else if(format == 'csv'){
+    
+    if(file.exists(name)){
+      system(paste0('rm -r ', name))
+    }
+    
+    system(paste0('mkdir ', name))
+    
+    for(temp_slot in c('gt', 'metadata', 'markers', 'loci_performance', 'asv_table', 'asv_seqs')){
+      
+      if(temp_slot == 'gt'){
+        
+        temp_sheet = data.frame(Sample_id = rownames(slot(ampseq_object, temp_slot)),
+                                as.data.frame(slot(ampseq_object, temp_slot)))
+        
+      }else if(temp_slot == 'asv_seqs'){
+        
+        if(!is.null(slot(ampseq_object, temp_slot))){
+          
+          temp_sheet = data.frame(asv_id = names(slot(ampseq_object, temp_slot)),
+                                  asv_seq = as.character(slot(ampseq_object, temp_slot)))
+          
+        }else{
+          temp_sheet = NULL
+        }
+        
+      }else if(temp_slot == 'markers'){
+        
+        temp_sheet = as.data.frame(slot(ampseq_object, temp_slot))
+        temp_sheet[is.infinite(temp_sheet[['distance']]),][['distance']] = NA
+        
+      }else{
+        
+        if(!is.null(slot(ampseq_object, temp_slot))){
+          temp_sheet = as.data.frame(slot(ampseq_object, temp_slot))
+        }else{
+          temp_sheet = NULL
+        }
+        
+        
+      }
+      
+      if(!is.null(temp_sheet)){
+        
+        write.csv(temp_sheet, paste0(file.path(name, temp_slot), '.csv'), quote = F, row.names = F)
+        
+      }
+      
+      
+    }
+    
     
   }else if(format == 'json'){
     # In development
@@ -888,6 +940,49 @@ read_ampseq = function(file = NULL, format = 'excel'){
         
         temp_sheet = readWorksheet(temp_wb, sheet = sheet)
         slot(ampseq_object, sheet, check = TRUE) = temp_sheet
+        
+      }
+    }
+    
+  }else if(format == 'csv'){
+    
+    for(sheet in list.files(file)){
+      if(sheet == 'gt.csv'){
+        
+        temp_sheet = read.csv(file.path(file, sheet))
+        temp_sheet_rownames = temp_sheet[,1]
+        temp_sheet = as.matrix(temp_sheet[,-1])
+        rownames(temp_sheet) = temp_sheet_rownames
+        
+        slot(ampseq_object, gsub('.csv','',sheet), check = TRUE) = temp_sheet
+        
+      }else if(sheet == 'asv_seqs'){
+        
+        temp_sheet = read.csv(file.path(file, sheet))
+        temp_sheet_names = temp_sheet[[1]]
+        temp_sheet = DNAStringSet(temp_sheet[[2]])
+        names(temp_sheet) = temp_sheet_names
+        
+        slot(ampseq_object, gsub('.csv','',sheet), check = TRUE) = temp_sheet
+        
+      }else if(sheet %in% c('metadata', 'loci_performance')){
+        
+        temp_sheet = read.csv(file.path(file, sheet))
+        temp_sheet_rownames = temp_sheet[,1]
+        rownames(temp_sheet) = temp_sheet_rownames
+        
+        slot(ampseq_object, gsub('.csv','',sheet), check = TRUE) = temp_sheet
+        
+      }else if(sheet == 'markers'){
+        
+        temp_sheet = read.csv(file.path(file, sheet))
+        temp_sheet[is.na(temp_sheet[['distance']]),][['distance']] = Inf
+        slot(ampseq_object, gsub('.csv','',sheet), check = TRUE) = temp_sheet
+        
+      }else{
+        
+        temp_sheet = read.csv(file.path(file, sheet))
+        slot(ampseq_object, gsub('.csv','',sheet), check = TRUE) = temp_sheet
         
       }
     }
@@ -3043,7 +3138,7 @@ drug_resistant_haplotypes = function(ampseq_object,
         7
       }else if(grepl('variant unreported', Phenotype) & !grepl('resistance', Phenotype)){
         6
-      }else if(grepl("^Amplicon.+amplify(; )?$", Phenotype)){
+      }else if(grepl("^Amplicon.+amplify; $", Phenotype)){
         9
       }else if(grepl('Gene .+ did not amplify', Phenotype)){
         10
@@ -6308,9 +6403,9 @@ get_pop_diversity = function(ampseq_object, strata){
                                                      Simpson = D,
                                                      Shannon = H,
                                                      Evenness = E,
-                                                     n.all = mean(loci_diversity$n.all),
-                                                     na.e = mean(loci_diversity$na.e),
-                                                     Hexp = mean(loci_diversity$Hexp)))
+                                                     n.all = mean(loci_diversity$n.all, na.rm = T),
+                                                     na.e = mean(loci_diversity$na.e, na.rm = T),
+                                                     Hexp = mean(loci_diversity$Hexp, na.rm = T)))
     }
     
   }
