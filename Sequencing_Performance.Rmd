@@ -878,6 +878,10 @@ ampseq_object@gt = mask_alt_alleles(ampseq_object, mask_formula = 'h_ij >= 0.66 
 
 **Define an strategy to identify systematic PCR errors.**
 
+```{r}
+ampseq_object@gt = mask_alt_alleles(ampseq_object, mask_formula = 'SNV_in_homopolymer == TRUE | INDEL_in_homopolymer == TRUE', ref_fasta = ref_fasta)
+```
+
 ## Read depth yield per sample and locus
 
 Inspect again the read depth coverage of our data:

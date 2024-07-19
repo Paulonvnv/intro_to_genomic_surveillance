@@ -2281,7 +2281,7 @@ drug_resistant_haplotypes = function(ampseq_object,
     for(temp_filter in 1:length(filters)){
       
       ampseq_object = filter_samples(ampseq_object,
-                     ampseq_object@metadata[[filters[[temp_filter]][1]]] %in% strsplit(filters[[temp_filter]][2],',')[[1]])
+                                     ampseq_object@metadata[[filters[[temp_filter]][1]]] %in% strsplit(filters[[temp_filter]][2],',')[[1]])
     }
   }
   
@@ -2597,7 +2597,7 @@ drug_resistant_haplotypes = function(ampseq_object,
                     temp_clone_phenotype = paste0(sample_allele, ' variant unreported for position ', position, ' in gene', gene)
                     
                   }
-                      
+                  
                 }else{# if position is not in reference table
                   
                   reference_allele = gsub('[0-9]+([A-z]|\\?|[A-z]\\|[A-z])', '', aacigar_haplotype[aacigar_haplotype[['position']] == position,'aacigar_haplotype'], ignore.case = T)
@@ -2624,7 +2624,7 @@ drug_resistant_haplotypes = function(ampseq_object,
                 }else{
                   clone_phenotype = paste(clone_phenotype, temp_clone_phenotype, sep = "|")
                 }
-              
+                
               }
               
               sample_phenotype = c(sample_phenotype, clone_phenotype)
@@ -2742,7 +2742,7 @@ drug_resistant_haplotypes = function(ampseq_object,
       phenotype = strsplit(phenotype_table[sample, gene], '; ')[[1]]
       
       if(sum(grepl('\\|', phenotype)) > 0){# if sample is heterozygous for the gene
-
+        
         phenotype_clone1 = gsub('\\|.+','',phenotype)
         phenotype_clone2 = gsub('.+\\|','',phenotype)
         
@@ -2871,11 +2871,11 @@ drug_resistant_haplotypes = function(ampseq_object,
       
       
       
-      }
-      
-      
     }
     
+    
+  }
+  
   # Match Genotypes with Phenotypes
   
   print("Match Genotypes with Phenotypes")
@@ -2967,7 +2967,7 @@ drug_resistant_haplotypes = function(ampseq_object,
         (!is.na(var2))&(!grepl('NA',var2)) ~ var2))
   }
   
-
+  
   # samples_pop_quarter = extended_aacigar_table %>%
   #   summarise(count = nlevels(as.factor(Sample_id)), .by = c(var1, var2)) 
   
@@ -3009,7 +3009,7 @@ drug_resistant_haplotypes = function(ampseq_object,
                                                    haplotype_counts$var1 == Pop&
                                                    haplotype_counts$var2 == date,][['count']]),
                             method = 'exact'
-                            )
+        )
         
         haplotype_counts[haplotype_counts$gene_names == gene&
                            haplotype_counts$var1 == Pop&
@@ -3138,7 +3138,7 @@ drug_resistant_haplotypes = function(ampseq_object,
         7
       }else if(grepl('variant unreported', Phenotype) & !grepl('resistance', Phenotype)){
         6
-      }else if(grepl("^Amplicon.+amplify; $", Phenotype)){
+      }else if(grepl("^Amplicon.+amplify(; )?$", Phenotype)){
         9
       }else if(grepl('Gene .+ did not amplify', Phenotype)){
         10
@@ -3185,7 +3185,7 @@ drug_resistant_haplotypes = function(ampseq_object,
   
   genotype_phenotype_match_sorted = 
     genotype_phenotype_match_sorted[genotype_phenotype_match_sorted$gene_haplo %in%
-                                    unique(haplotype_counts$gene_haplo ),]
+                                      unique(haplotype_counts$gene_haplo ),]
   
   
   haplotype_counts = left_join(haplotype_counts,
@@ -3282,7 +3282,7 @@ drug_resistant_haplotypes = function(ampseq_object,
           }else{
             
             temp_drug_phenotype_table[sample,][[drug]] = paste(temp_drug_phenotype_table[sample,][[drug]],
-                                                          gene_phenotype, sep = '; ')
+                                                               gene_phenotype, sep = '; ')
             
           }
           
@@ -3308,7 +3308,7 @@ drug_resistant_haplotypes = function(ampseq_object,
           }else{
             
             temp_drug_phenotype_table[sample,][[drug]] = paste(temp_drug_phenotype_table[sample,][[drug]],
-                                                          gene_phenotype, sep = '; ')
+                                                               gene_phenotype, sep = '; ')
             
           }
           
@@ -3321,10 +3321,10 @@ drug_resistant_haplotypes = function(ampseq_object,
       if(sum(grepl('Sensitive', phenotype)) == length(phenotype)){
         
         temp_drug_phenotype_table[sample,][[drug]] = paste0('Sensitive phenotype based on gene(s) ',
-                                                       ifelse(length(genes) > 1,
-                                                              paste(paste(genes[-length(genes)], collapse = ', '), genes[length(genes)], sep = ' and '),
-                                                              genes)
-                                                       )
+                                                            ifelse(length(genes) > 1,
+                                                                   paste(paste(genes[-length(genes)], collapse = ', '), genes[length(genes)], sep = ' and '),
+                                                                   genes)
+        )
         
       }
       
@@ -3333,10 +3333,10 @@ drug_resistant_haplotypes = function(ampseq_object,
       if(sum(grepl('Gene .+ did not amplified', phenotype)) == length(phenotype)){
         
         temp_drug_phenotype_table[sample,][[drug]] = paste0('Gene(s) ',
-                                                       ifelse(length(genes) > 1,
-                                                              paste(paste(genes[-length(genes)], collapse = ', '), genes[length(genes)], sep = ' and '),
-                                                              genes),
-                                                       ' did not amplified'
+                                                            ifelse(length(genes) > 1,
+                                                                   paste(paste(genes[-length(genes)], collapse = ', '), genes[length(genes)], sep = ' and '),
+                                                                   genes),
+                                                            ' did not amplified'
         )
         
       }
@@ -3345,25 +3345,25 @@ drug_resistant_haplotypes = function(ampseq_object,
       # Check for partial haplotypes
       
       if(is.na(temp_drug_phenotype_table[sample,][[drug]])){
-
-
+        
+        
         partial_haplotypes = phenotype[which(!grepl('Sensitive', phenotype))]
         
         
         temp_drug_phenotype_table[sample,][[drug]] = paste0('Partial haplotype: ',
-                                                       ifelse(length(partial_haplotypes) > 1,
-                                                              paste(paste(partial_haplotypes[-length(partial_haplotypes)], collapse = ', '), partial_haplotypes[length(partial_haplotypes)], sep = ' and '),
-                                                              partial_haplotypes))
-    
-
+                                                            ifelse(length(partial_haplotypes) > 1,
+                                                                   paste(paste(partial_haplotypes[-length(partial_haplotypes)], collapse = ', '), partial_haplotypes[length(partial_haplotypes)], sep = ' and '),
+                                                                   partial_haplotypes))
+        
+        
       }
       
       
-         
+      
     }
     
     drug_phenotype_table[[drug]] = temp_drug_phenotype_table[[drug]]
-      
+    
   }
   
   
@@ -3497,17 +3497,17 @@ drug_resistant_haplotypes = function(ampseq_object,
   print('drug_phenotyope_lineplot')
   drug_phenotyope_lineplot = drug_phenotype_summary %>%
     ggplot(aes(y = freq, x = var2, group  = factor(Phenotype,
-                                                           levels = c("Mutation(s) associated with a resistant phenotype",
-                                                                      "Polymorphism(s) respect to reference strain",
-                                                                      "Sensitive Phenotype",
-                                                                      "Partial Haplotype",
-                                                                      "Missing data")),
+                                                   levels = c("Mutation(s) associated with a resistant phenotype",
+                                                              "Polymorphism(s) respect to reference strain",
+                                                              "Sensitive Phenotype",
+                                                              "Partial Haplotype",
+                                                              "Missing data")),
                color = factor(Phenotype,
-                                      levels = c("Mutation(s) associated with a resistant phenotype",
-                                                 "Polymorphism(s) respect to reference strain",
-                                                 "Sensitive Phenotype",
-                                                 "Partial Haplotype",
-                                                 "Missing data")))) +
+                              levels = c("Mutation(s) associated with a resistant phenotype",
+                                         "Polymorphism(s) respect to reference strain",
+                                         "Sensitive Phenotype",
+                                         "Partial Haplotype",
+                                         "Missing data")))) +
     geom_point()+
     geom_errorbar(aes(ymin = freq_lower, ymax = freq_upper), alpha = .5, width = .2)+
     geom_line()+
@@ -3520,10 +3520,10 @@ drug_resistant_haplotypes = function(ampseq_object,
          x = 'Date of Collection',
          color = 'Phenotype')
   
-
+  
   
   print("Estimating frequency for drug resistant phenotypes")
-
+  
   if(!is.null(Longitude) & !is.null(Latitude)){
     
     drug_phenotype_summary_sdf = drug_phenotype_summary %>% 
@@ -3531,18 +3531,18 @@ drug_resistant_haplotypes = function(ampseq_object,
                 Latitude = mean(Latitude),
                 count = sum(count), .by = c(Drug, Phenotype, var1))
     
-  
-  drug_phenotype_summary_sdf$ssize = NA
-  drug_phenotype_summary_sdf$freq = NA
-  drug_phenotype_summary_sdf$freq_lower = NA
-  drug_phenotype_summary_sdf$freq_upper = NA
-  
-  
-  for(drug in levels(as.factor(drug_phenotype_summary_sdf$Drug))){
-    for(Pop in levels(as.factor(drug_phenotype_summary_sdf[drug_phenotype_summary_sdf$Drug == drug,][['var1']]))){
-      
-      ssize = sum(drug_phenotype_summary_sdf[drug_phenotype_summary_sdf$Drug == drug &
-                                               drug_phenotype_summary_sdf$var1 == Pop,][['count']])
+    
+    drug_phenotype_summary_sdf$ssize = NA
+    drug_phenotype_summary_sdf$freq = NA
+    drug_phenotype_summary_sdf$freq_lower = NA
+    drug_phenotype_summary_sdf$freq_upper = NA
+    
+    
+    for(drug in levels(as.factor(drug_phenotype_summary_sdf$Drug))){
+      for(Pop in levels(as.factor(drug_phenotype_summary_sdf[drug_phenotype_summary_sdf$Drug == drug,][['var1']]))){
+        
+        ssize = sum(drug_phenotype_summary_sdf[drug_phenotype_summary_sdf$Drug == drug &
+                                                 drug_phenotype_summary_sdf$var1 == Pop,][['count']])
         
         temp_freq = binconf(drug_phenotype_summary_sdf[drug_phenotype_summary_sdf$Drug == drug &
                                                          drug_phenotype_summary_sdf$var1 == Pop,][['count']],
@@ -3563,43 +3563,43 @@ drug_resistant_haplotypes = function(ampseq_object,
                                      drug_phenotype_summary_sdf$var1 == Pop,][['freq_upper']] = round(temp_freq[,3], 2)
         
         
+      }
     }
-  }
-  
-  
-  drug_phenotype_summary_sdf %<>% filter(!is.na(Longitude), !is.na(Latitude))
-  
-  drug_phenotype_summary_sdf %<>% mutate(logssize = log(ssize, 1.3))
-  
-  drug_phenotype_summary_sdf %<>% filter(Phenotype == "Mutation(s) associated with a resistant phenotype")
-  
-  
-  print("Transforming data to spatial points")
-  drug_phenotype_summary_sdf = SpatialPointsDataFrame(coords = drug_phenotype_summary_sdf[,c("Longitude", "Latitude")],
-                                                    data = drug_phenotype_summary_sdf,
-                                                    proj4string = CRS("+init=epsg:4326"))
-
-
-  tmap_mode('view')
-  print('i_drug_map')
-  i_drug_map = tm_shape(drug_phenotype_summary_sdf)+
-    tm_dots(size = "logssize", style="pretty", col = "freq")+
-    tm_text("freq", size=1)+
-    tm_facets(by = "Drug")+
-    tm_scale_bar()
-  
-  
-  drug_resistant_hap_list = list(aa_mutations = haps_respect_to_ref$loci_aa_table,
-                                 dna_mutations = haps_respect_to_ref$loci_dna_table,
-                                 genotype_phenotype_table = genotype_phenotype_table,
-                                 drug_phenotype_table = drug_phenotype_table,
-                                 drug_phenotyope_lineplot = drug_phenotyope_lineplot,
-                                 drug_phenotype_barplot = drug_phenotype_barplot,
-                                 drug_phenotype_summary_sdf = drug_phenotype_summary_sdf,
-                                 i_drug_map = i_drug_map,
-                                 haplotypes_freq_lineplot = haplotypes_freq_lineplot,
-                                 haplotype_freq_barplot = haplotype_freq_barplot)
-  
+    
+    
+    drug_phenotype_summary_sdf %<>% filter(!is.na(Longitude), !is.na(Latitude))
+    
+    drug_phenotype_summary_sdf %<>% mutate(logssize = log(ssize, 1.3))
+    
+    drug_phenotype_summary_sdf %<>% filter(Phenotype == "Mutation(s) associated with a resistant phenotype")
+    
+    
+    print("Transforming data to spatial points")
+    drug_phenotype_summary_sdf = SpatialPointsDataFrame(coords = drug_phenotype_summary_sdf[,c("Longitude", "Latitude")],
+                                                        data = drug_phenotype_summary_sdf,
+                                                        proj4string = CRS("+init=epsg:4326"))
+    
+    
+    tmap_mode('view')
+    print('i_drug_map')
+    i_drug_map = tm_shape(drug_phenotype_summary_sdf)+
+      tm_dots(size = "logssize", style="pretty", col = "freq")+
+      tm_text("freq", size=1)+
+      tm_facets(by = "Drug")+
+      tm_scale_bar()
+    
+    
+    drug_resistant_hap_list = list(aa_mutations = haps_respect_to_ref$loci_aa_table,
+                                   dna_mutations = haps_respect_to_ref$loci_dna_table,
+                                   genotype_phenotype_table = genotype_phenotype_table,
+                                   drug_phenotype_table = drug_phenotype_table,
+                                   drug_phenotyope_lineplot = drug_phenotyope_lineplot,
+                                   drug_phenotype_barplot = drug_phenotype_barplot,
+                                   drug_phenotype_summary_sdf = drug_phenotype_summary_sdf,
+                                   i_drug_map = i_drug_map,
+                                   haplotypes_freq_lineplot = haplotypes_freq_lineplot,
+                                   haplotype_freq_barplot = haplotype_freq_barplot)
+    
   }else{
     
     drug_resistant_hap_list = list(aa_mutations = haps_respect_to_ref$loci_aa_table,
@@ -3617,6 +3617,7 @@ drug_resistant_haplotypes = function(ampseq_object,
   return(drug_resistant_hap_list)
   
 }
+
 
 
 get_Fws = function(ampseq_object = NULL){

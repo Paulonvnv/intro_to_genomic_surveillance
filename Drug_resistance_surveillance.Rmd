@@ -17,15 +17,14 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, include = TRUE)
 ```
 
-
 Surveillance of polymorphisms or allelic variants associated with
 resistance against antimalarials is an important public health
 objective. Therefore most amplicon panels include several markers
 against genes that have polymorphisms associated with antimalarial
-resistance (i.e. AMPLseq includes 9 markers within 5 genes). This tutorial
-identifies the different haplotypes of these genes present in our data
-set, and we will determine the frequency of each haplotype in each
-category of two Variables of interest.
+resistance (i.e. AMPLseq includes 9 markers within 5 genes). This
+tutorial identifies the different haplotypes of these genes present in
+our data set, and we will determine the frequency of each haplotype in
+each category of two Variables of interest.
 
 # Upload libraries, functions and data
 
@@ -35,13 +34,15 @@ source('~/Documents/Github/intro_to_genomic_surveillance/docs/functions_and_libr
 #sourceCpp('~/Documents/Github/intro_to_genomic_surveillance/docs/functions_and_libraries/hmmloglikelihood.cpp')
 ```
 
-Upload the data in ampseq format from the file `Pfal_ampseq_filtered.xlsx`
+Upload the data in ampseq format from the file
+`Pfal_ampseq_filtered.xlsx`
 
 ```{r 'uploading filtered amplicon sequencing data'}
-ampseq_object = read_ampseq('~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pfal_example/Pfal_ampseq_filtered.xlsx', format = 'excel')
+ampseq_object = read_ampseq('~/Documents/Github/intro_to_genomic_surveillance/docs/data/Pfal_example/Pfal_ampseq_filtered', format = 'csv')
 ```
 
-Inspect the metadata, and gnerate a bar plot of the number of sequenced samples by Subnational_level2, and Quarter_of_Collection
+Inspect the metadata, and gnerate a bar plot of the number of sequenced
+samples by Subnational_level2, and Quarter_of_Collection
 
 ```{r 'Ploting the number of collected samples by Municipality over time'}
 
@@ -75,16 +76,16 @@ plot_temporal_collection_of_samples
 
 # Drug resistance surveillance
 
-The AMPLseq panel includes 5 genes (9 markers in
-total, some genes are genotyped by more than one marker) that have
-polymorphisms associated with antimalarial resistance.
-In this section we will identify the different haplotypes of these genes present in our
-data set, and we will determine the frequency of each haplotype in each
-study area and in each quarter of the year. For this we will use the
-function `drug_resistant_haplotypes` which has 7 arguments. The first
-argument is the `ampseq_object`. The second is a table with the
-reference alleles for each gene, and the polymorphisms associated with
-resistance. The structure of this table is as follows:
+The AMPLseq panel includes 5 genes (9 markers in total, some genes are
+genotyped by more than one marker) that have polymorphisms associated
+with antimalarial resistance. In this section we will identify the
+different haplotypes of these genes present in our data set, and we will
+determine the frequency of each haplotype in each study area and in each
+quarter of the year. For this we will use the function
+`drug_resistant_haplotypes` which has 7 arguments. The first argument is
+the `ampseq_object`. The second is a table with the reference alleles
+for each gene, and the polymorphisms associated with resistance. The
+structure of this table is as follows:
 
 $$\begin{array}{c|c:c:c} \text{Chromosome} & \text{Gene_ID} & \text{Description} & \text{Mutation} & \text{Anotation} \\ \text{Pf3D7_04_v3} & \text{PF3D7_0417200} & dhfr & \text{N51I} & \text{Pyrimethamine resistance} \\ ... \end{array}$$
 
@@ -150,8 +151,8 @@ drug_resistant_haplotypes_plot = drug_resistant_haplotypes(
 
 ```
 
-
 ## Outputs
+
 ### Individual (sample-level) gene genotypes
 
 > *Plasmodium* parasites are haploid during the erythrocytic stage.
