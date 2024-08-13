@@ -693,7 +693,7 @@ Generate a histogram of the density of variant sites per allele.
 ```{r}
 plot_off_target_stats = off_target_stats %>%
     ggplot(aes(x= dVSITES_ij)) + 
-    geom_vline(xintercept = 0.3,
+    geom_vline(xintercept = 0.25,
                linetype = 2) +
     geom_histogram(binwidth = 0.01) + 
     theme_bw()
@@ -708,7 +708,7 @@ Identify how many alleles would be removed using a filter of 0.3.
 
 ```{r}
 
-n_off_target_alleles = off_target_stats[off_target_stats$dVSITES_ij >= 0.3,][['Allele']]
+n_off_target_alleles = off_target_stats[off_target_stats$dVSITES_ij >= 0.25,][['Allele']]
 
 print(paste0(length(n_off_target_alleles), ' allele(s) match(es) the criteria to define off-target products'))
 ```
@@ -718,14 +718,14 @@ Check what are those allele:
 ```{r, eval = FALSE}
 
 View(off_target_stats%>%
-  filter(dVSITES_ij >= 0.3))
+  filter(dVSITES_ij >= 0.25))
 
 ```
 
 remove off-target products:
 
 ```{r}
-ampseq_object@gt = mask_alt_alleles(ampseq_object, mask_formula = 'dVSITES_ij >= 0.3', ref_fasta = ref_fasta)
+ampseq_object@gt = mask_alt_alleles(ampseq_object, mask_formula = 'dVSITES_ij >= 0.25', ref_fasta = ref_fasta)
 ```
 
 ### Products with flanking INDELs
@@ -783,14 +783,14 @@ Identify how many alleles would be removed using
 `h_ij >= 0.66 & h_ijminor >= 0.66`:
 
 ```{r}
-n_flanking_INDEL_alleles = flanking_INDEL_stats[flanking_INDEL_stats$flanking_INDEL == TRUE & flanking_INDEL_stats$h_ij >= 0.66 & flanking_INDEL_stats$h_ijminor >= 0.66, ][['Allele']]
+n_flanking_INDEL_alleles = flanking_INDEL_stats[flanking_INDEL_stats$flanking_INDEL == TRUE, ][['Allele']]
 print(paste0(length(n_flanking_INDEL_alleles), ' allele(s) match(es) the criteria to identify products with flanking INDELs'))
 ```
 
 ```{r, eval = FALSE}
 View(
   flanking_INDEL_stats %>%
-    filter(flanking_INDEL == TRUE & h_ij >= 0.66 & h_ijminor >= 0.66)
+    filter(flanking_INDEL == TRUE)
 )
 
 ```
@@ -798,7 +798,122 @@ View(
 Mask alleles with flanking indels:
 
 ```{r}
-ampseq_object@gt = mask_alt_alleles(ampseq_object, mask_formula = 'flanking_INDEL == TRUE & h_ij >= 0.66 & h_ijminor >= 0.66', ref_fasta = ref_fasta)
+
+while(length(n_flanking_INDEL_alleles) > 0){
+  ampseq_object@gt = mask_alt_alleles(ampseq_object, mask_formula = 'flanking_INDEL == TRUE',
+                                      ref_fasta = ref_fasta)
+  
+  flanking_INDEL_stats2 = frac_ofHet_pAlt_byAllele(ampseq_object, 
+                                            ref_fasta = ref_fasta)
+  n_flanking_INDEL_alleles = 
+    flanking_INDEL_stats2[flanking_INDEL_stats2$flanking_INDEL == TRUE, ][['Allele']]
+}
+
+
+```
+
+### PCR errors due to homopolymers
+
+Run the function again `frac_ofHet_pAlt_byAllele`:
+
+```{r}
+homopolymers_stats = frac_ofHet_pAlt_byAllele(ampseq_object, 
+                                            ref_fasta = ref_fasta)
+```
+
+Generate a scatter plot of the density of variant sites per allele.
+
+```{r}
+
+h_ij_thres = 0.66
+h_ijminor_thres = 0.66
+
+plot_homopolymers_stats = homopolymers_stats %>%
+      mutate(h_ijminor_cat = case_when(
+        h_ijminor < h_ijminor_thres ~ paste0('h_ijminor < ',h_ijminor_thres),
+        h_ijminor >= h_ijminor_thres ~ paste0('h_ijminor >= ',h_ijminor_thres)
+      ),
+      
+      vsites_in_homopopylmers = case_when(
+        SNV_in_homopolymer == FALSE & INDEL_in_homopolymer == FALSE ~ 'No VSites in Hom.',
+        SNV_in_homopolymer == TRUE ~ 'SNV in Hom.',
+        INDEL_in_homopolymer == TRUE ~ 'INDEL in Hom.'
+      )
+      
+      )%>%
+      ggplot(aes(x = p_ij, 
+                 y = h_ij,
+                 color = h_ijminor))+
+      geom_point()+
+      geom_hline(yintercept = h_ij_thres,
+                 linetype = 2) +
+      theme_bw()+
+      scale_color_continuous(type = 'viridis')+
+      facet_grid(vsites_in_homopopylmers ~ h_ijminor_cat)+
+      labs(x = 'Alternative allele prev. (p_ij)',
+           y = 'h_ij (H_ij/P_ij)',
+           color = 'h_ijminor')
+
+```
+
+```{r, fig.width=7, fig.height=7, fig.cap="**Figure 5:** Identification of flanking INDELs. The scatter plot shows the distribution of the prevalence of the alternative allele (p_ij), the frequency of the alternative allele as heterozygous (h_ij), and the frequency of the alternative allele as minor allele (h_ijminor). The panels FALSE and TRUE represent alleles that do not contain or contain flanking INDELs."}
+plot_homopolymers_stats
+```
+
+Identify how many alleles would be removed using
+`h_ij >= 0.66 & h_ijminor >= 0.66`:
+
+```{r}
+n_snv_in_homopolymer_alleles = homopolymers_stats[
+  homopolymers_stats$SNV_in_homopolymer == TRUE, ][['Allele']]
+print(paste0(length(n_snv_in_homopolymer_alleles), ' allele(s) match(es) the criteria to identify products with SNVs in homopolymers'))
+```
+
+Identify how many alleles would be removed using
+`h_ij >= 0.66 & h_ijminor >= 0.66`:
+
+```{r}
+n_indel_in_homopolymer_alleles = homopolymers_stats[homopolymers_stats$INDEL_in_homopolymer == TRUE, ][['Allele']]
+print(paste0(length(n_indel_in_homopolymer_alleles), ' allele(s) match(es) the criteria to identify products with INDELs in homopolymers'))
+```
+
+```{r, eval = FALSE}
+View(
+  homopolymers_stats %>%
+    filter(MHap %in%
+           c('PVP01_0103700_2',
+             'RIPR',
+             'PVP01_0838300',
+             'SLARP',
+             'FRM1_1',
+             'PVP01_1301600_1',
+             'PIGM')
+           )
+)
+
+```
+
+Mask alleles with flanking indels:
+
+```{r}
+
+while(length(n_flanking_INDEL_alleles) > 0){
+  ampseq_object@gt = mask_alt_alleles(ampseq_object, mask_formula = 'flanking_INDEL == TRUE',
+                                      ref_fasta = ref_fasta)
+  
+  flanking_INDEL_stats2 = frac_ofHet_pAlt_byAllele(ampseq_object, 
+                                            ref_fasta = ref_fasta)
+  n_flanking_INDEL_alleles = 
+    flanking_INDEL_stats2[flanking_INDEL_stats2$flanking_INDEL == TRUE, ][['Allele']]
+}
+
+
+```
+
+### 
+
+```{r}
+ampseq_object@gt = mask_alt_alleles(ampseq_object, mask_formula = 'SNV_in_homopolymer == TRUE | INDEL_in_homopolymer == TRUE', ref_fasta = ref_fasta)
 ```
 
 ### Stochastic PCR errors
@@ -874,12 +989,6 @@ Remove stochastic PCR errors:
 
 ```{r}
 ampseq_object@gt = mask_alt_alleles(ampseq_object, mask_formula = 'h_ij >= 0.66 & h_ijminor >= 0.66', ref_fasta = ref_fasta)
-```
-
-**Define an strategy to identify systematic PCR errors.**
-
-```{r}
-ampseq_object@gt = mask_alt_alleles(ampseq_object, mask_formula = 'SNV_in_homopolymer == TRUE | INDEL_in_homopolymer == TRUE', ref_fasta = ref_fasta)
 ```
 
 ## Read depth yield per sample and locus
